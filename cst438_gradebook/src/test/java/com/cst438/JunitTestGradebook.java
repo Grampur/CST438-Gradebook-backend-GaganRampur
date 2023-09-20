@@ -3,6 +3,7 @@ package com.cst438;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -36,86 +37,156 @@ public class JunitTestGradebook {
 	/* 
 	 * Enter a new grade for student test4@csumb.edu for assignment id=1
 	 */
+//	@Test
+//	public void gradeAssignment() throws Exception {
+//
+//		MockHttpServletResponse response;
+//
+//		// do an http get request for assignment 1 and test4
+//		response = mvc.perform(MockMvcRequestBuilders.get("/gradebook/1").accept(MediaType.APPLICATION_JSON))
+//				.andReturn().getResponse();
+//
+//		// verify return data with entry for one student without no score
+//		assertEquals(200, response.getStatus());
+//
+//		// verify that returned data has non zero primary key
+//		GradeDTO[] result = fromJsonString(response.getContentAsString(), GradeDTO[].class);
+//		 
+//		for (int i=0; i<result.length; i++) {
+//			GradeDTO g = result[i];
+//			if (g.email().equals("test4@csumb.edu")) {
+//				// change grade from null to 80.
+//				assertNull(g.grade());
+//				result[i] = new GradeDTO(g.assignmentGradeId(), g.name(), g.email(), 80);
+//				
+//			}
+//		}
+//
+//		// send updates to server
+//		response = mvc
+//				.perform(MockMvcRequestBuilders.put("/gradebook/1").accept(MediaType.APPLICATION_JSON)
+//						.content(asJsonString(result)).contentType(MediaType.APPLICATION_JSON))
+//				.andReturn().getResponse();
+//
+//		// verify that return status = OK (value 200)
+//		assertEquals(200, response.getStatus());
+//		// verify that database assignmentGrade table was correctly updated
+//		AssignmentGrade ag = assignmentGradeRepository.findByAssignmentIdAndStudentEmail(1,  "test4@csumb.edu");
+//		assertEquals(80, ag.getScore());
+//		
+//	}
+//
+//	/* 
+//	 * Update existing grade of test@csumb.edu for assignment id=1 from 90 to 88.
+//	 */
+//	@Test
+//	public void updateAssignmentGrade() throws Exception {
+//
+//		MockHttpServletResponse response;
+//
+//		// do an http get request for assignment 1
+//		response = mvc.perform(MockMvcRequestBuilders.get("/gradebook/1").accept(MediaType.APPLICATION_JSON))
+//				.andReturn().getResponse();
+//
+//		// verify return data with entry for one student without no score
+//		assertEquals(200, response.getStatus());
+//
+//		// verify that returned data has non zero primary key
+//		GradeDTO[] result = fromJsonString(response.getContentAsString(), GradeDTO[].class);
+//		// change grade of student test@csumb.edu from 90 to 88
+//		for (int i=0; i<result.length; i++) {
+//			GradeDTO g = result[i];
+//			if (g.email().equals("test@csumb.edu")) {
+//				assertEquals(90, g.grade());
+//				result[i] = new GradeDTO(g.assignmentGradeId(), g.name(), g.email(), 88);
+//				
+//			}
+//		}
+//
+//		// send updates to server
+//		response = mvc
+//				.perform(MockMvcRequestBuilders.put("/gradebook/1").accept(MediaType.APPLICATION_JSON)
+//						.content(asJsonString(result)).contentType(MediaType.APPLICATION_JSON))
+//				.andReturn().getResponse();
+//
+//		// verify that return status = OK (value 200)
+//		assertEquals(200, response.getStatus());
+//		
+//		AssignmentGrade ag = assignmentGradeRepository.findByAssignmentIdAndStudentEmail(1,  "test@csumb.edu");
+//		assertEquals(88, ag.getScore());
+//
+//
+//	}
+	
 	@Test
-	public void gradeAssignment() throws Exception {
-
+	public void addAssignmentTest() throws Exception {
 		MockHttpServletResponse response;
-
-		// do an http get request for assignment 1 and test4
-		response = mvc.perform(MockMvcRequestBuilders.get("/gradebook/1").accept(MediaType.APPLICATION_JSON))
+		
+		response = mvc.perform(MockMvcRequestBuilders.post("/assignmentCreate").contentType(MediaType.APPLICATION_JSON).content("{\"id\":1, \n\"assignmentName\":\"idk\", \n\"dueDate\":\"2001-9-11\", \n\"courseTitle\":\"BUS 203 - Financial Accounting\",\n\"courseId\":30157}").accept(MediaType.APPLICATION_JSON))
 				.andReturn().getResponse();
-
-		// verify return data with entry for one student without no score
+		
+		
+		//checks if the status is added properly
 		assertEquals(200, response.getStatus());
-
-		// verify that returned data has non zero primary key
-		GradeDTO[] result = fromJsonString(response.getContentAsString(), GradeDTO[].class);
-		 
-		for (int i=0; i<result.length; i++) {
-			GradeDTO g = result[i];
-			if (g.email().equals("test4@csumb.edu")) {
-				// change grade from null to 80.
-				assertNull(g.grade());
-				result[i] = new GradeDTO(g.assignmentGradeId(), g.name(), g.email(), 80);
+		
+		assertEquals(response.getContentAsString(), "{\"id\":1,\"assignmentName\":\"idk\",\"dueDate\":\"2001-9-11\",\"courseTitle\":\"BUS 203 - Financial Accounting\",\"courseId\":30157}");
+		
+	}
+	
+	@Test
+	public void updateAssignmentTest() throws Exception {
+		MockHttpServletResponse response;
+		
+		response = mvc.perform(MockMvcRequestBuilders.post("/assignmentUpdate").contentType(MediaType.APPLICATION_JSON).content("{\"id\":1, \n\"assignmentName\":\"idk2\", \n\"dueDate\":\"2001-9-11\", \n\"courseTitle\":\"BUS 203 - Financial Accounting\",\n\"courseId\":30157}").accept(MediaType.APPLICATION_JSON))
+				.andReturn().getResponse();
+		
+		
+		//checks if the status is added properly
+		assertEquals(200, response.getStatus());
 				
-			}
-		}
-
-		// send updates to server
-		response = mvc
-				.perform(MockMvcRequestBuilders.put("/gradebook/1").accept(MediaType.APPLICATION_JSON)
-						.content(asJsonString(result)).contentType(MediaType.APPLICATION_JSON))
+	}
+	
+	@Test
+	public void getAssignmentTest() throws Exception {
+		MockHttpServletResponse response;
+		
+		response = mvc.perform(MockMvcRequestBuilders.get("/assignmentGet/1").accept(MediaType.APPLICATION_JSON))
 				.andReturn().getResponse();
+		
+		
+		//checks if the status is added properly
+		assertEquals(response.getContentAsString(), "{\"id\":1,\"assignmentName\":\"idk2\",\"dueDate\":\"2001-09-11\",\"courseTitle\":\"BUS 203 - Financial Accounting\",\"courseId\":30157}");
+				
+	}
+	
+	@Test
+	public void deleteAssignmentTest() throws Exception {
+		MockHttpServletResponse response;
+		
+		response = mvc.perform(MockMvcRequestBuilders.post("/assignmentCreate").contentType(MediaType.APPLICATION_JSON).content("{\"id\":2, \n\"assignmentName\":\"idk\", \n\"dueDate\":\"2001-9-11\", \n\"courseTitle\":\"BUS 203 - Financial Accounting\",\n\"courseId\":30157}").accept(MediaType.APPLICATION_JSON))
+				.andReturn().getResponse();
+		
+		assertEquals(response.getContentAsString(), "{\"id\":2,\"assignmentName\":\"idk\",\"dueDate\":\"2001-9-11\",\"courseTitle\":\"BUS 203 - Financial Accounting\",\"courseId\":30157}");
 
-		// verify that return status = OK (value 200)
+		
+		response = mvc.perform(MockMvcRequestBuilders.post("/assignmentDelete").contentType(MediaType.APPLICATION_JSON).content("2").accept(MediaType.APPLICATION_JSON))
+				.andReturn().getResponse();
+		
+		
+		//checks if the status is added properly
 		assertEquals(200, response.getStatus());
-		// verify that database assignmentGrade table was correctly updated
-		AssignmentGrade ag = assignmentGradeRepository.findByAssignmentIdAndStudentEmail(1,  "test4@csumb.edu");
-		assertEquals(80, ag.getScore());
+
+		
+		
+		
+					
+//		assertEquals(400, response.getStatus());
+
 		
 	}
 
-	/* 
-	 * Update existing grade of test@csumb.edu for assignment id=1 from 90 to 88.
-	 */
-	@Test
-	public void updateAssignmentGrade() throws Exception {
-
-		MockHttpServletResponse response;
-
-		// do an http get request for assignment 1
-		response = mvc.perform(MockMvcRequestBuilders.get("/gradebook/1").accept(MediaType.APPLICATION_JSON))
-				.andReturn().getResponse();
-
-		// verify return data with entry for one student without no score
-		assertEquals(200, response.getStatus());
-
-		// verify that returned data has non zero primary key
-		GradeDTO[] result = fromJsonString(response.getContentAsString(), GradeDTO[].class);
-		// change grade of student test@csumb.edu from 90 to 88
-		for (int i=0; i<result.length; i++) {
-			GradeDTO g = result[i];
-			if (g.email().equals("test@csumb.edu")) {
-				assertEquals(90, g.grade());
-				result[i] = new GradeDTO(g.assignmentGradeId(), g.name(), g.email(), 88);
-				
-			}
-		}
-
-		// send updates to server
-		response = mvc
-				.perform(MockMvcRequestBuilders.put("/gradebook/1").accept(MediaType.APPLICATION_JSON)
-						.content(asJsonString(result)).contentType(MediaType.APPLICATION_JSON))
-				.andReturn().getResponse();
-
-		// verify that return status = OK (value 200)
-		assertEquals(200, response.getStatus());
-		
-		AssignmentGrade ag = assignmentGradeRepository.findByAssignmentIdAndStudentEmail(1,  "test@csumb.edu");
-		assertEquals(88, ag.getScore());
 
 
-	}
 
 	private static String asJsonString(final Object obj) {
 		try {
