@@ -1,5 +1,8 @@
 package com.cst438.services;
 
+
+import com.cst438.domain.*;
+import javax.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -35,7 +38,13 @@ public class RegistrationServiceREST implements RegistrationService {
 	@Override
 	public void sendFinalGrades(int course_id , FinalGradeDTO[] grades) { 
 		
-		//TODO use restTemplate to send final grades to registration service
+			//TODO use restTemplate to send final grades to registration service'
+		
+			String url = registration_url  + course_id;
+			
+			System.out.println(url);
+			
+			restTemplate.put(url, grades);
 		
 	}
 	
@@ -58,8 +67,24 @@ public class RegistrationServiceREST implements RegistrationService {
 		
 		System.out.println("GradeBook addEnrollment "+enrollmentDTO);
 		
-		//TODO remove following statement when complete.
-		return null;
+	    // Retrieve the course from the database based on the course ID in the DTO
+	    Course course = courseRepository.findById(enrollmentDTO.courseId())
+	                                    .orElseThrow(() -> new EntityNotFoundException("Course not found"));
+	
+		//receive dto 
+		
+		Enrollment enrollment = new Enrollment();
+		enrollment.setId(enrollmentDTO.id());
+	    enrollment.setStudentEmail(enrollmentDTO.studentEmail());
+	    enrollment.setStudentName(enrollmentDTO.studentName());	
+	    enrollment.setCourse(course);
+	    
+	    enrollmentRepository.save(enrollment);
+	
+	    
+	    return enrollmentDTO;
+		    
+
 		
 	}
 
