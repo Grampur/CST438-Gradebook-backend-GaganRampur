@@ -30,8 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class EndToEndTestSubmitGrades {
 
-	public static final String CHROME_DRIVER_FILE_LOCATION = "C:/chromedriver_win32/chromedriver.exe";
-
+	public static final String CHROME_DRIVER_FILE_LOCATION = "C:Users/gramp/OneDrive/Desktop/chromedriver_win32/chromedriver.exe";
 	public static final String URL = "http://localhost:3000";
 	public static final int SLEEP_DURATION = 1000; // 1 second.
 	public static final String TEST_ASSIGNMENT_NAME = "db design";
